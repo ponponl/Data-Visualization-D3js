@@ -24,67 +24,67 @@
 <div id="dataviz" style ="display: flex;">
     <div class="dataitem" id="chart">
     <script>
-        // set the dimensions and margins of the graph
-      var margin = {top: 40, right: 30, bottom: 50, left: 60},
-        width = 460 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
+            // set the dimensions and margins of the graph
+        var margin = {top: 40, right: 30, bottom: 50, left: 60},
+          width = 460 - margin.left - margin.right,
+          height = 400 - margin.top - margin.bottom;
 
 
-    // append the svg object to the body of the page
-    var div = d3.select("body").append("div")
-        .attr("class", "tooltip-donut")
-        .style("opacity", 0);
+        // append the svg object to the body of the page
+        var div = d3.select("body").append("div")
+          .attr("class", "tooltip-donut")
+          .style("opacity", 0);
 
-    var svg = d3.select("#chart")
-      .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform",
-              "translate(" + margin.left + "," + margin.top + ")");
+        var svg = d3.select("#chart")
+          .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform",
+                  "translate(" + margin.left + "," + margin.top + ")");
 
-    svg.append("text")
-      .attr("x", width / 2)
-      .attr("y", -20)
-      .attr("text-anchor", "middle")
-      .style("font-size", "16px")
-      .style("font-weight", "bold")
-      .text("Heart Disease Distribution across Age Groups");
-
-    // Parse the Data
-    d3.csv("heart_disease_by_age_group.csv", function(data) {
-
-      // List of subgroups = header of the csv files = soil condition here
-      var subgroups = data.columns.slice(1)
-      console.log(subgroups)
-
-      // List of groups = species here = value of the first column called group -> I show them on the X axis
-      var groups = d3.map(data, function(d){return(d.Age)}).keys()
-      console.log(groups)
-
-      // Add X axis
-      var x = d3.scaleBand()
-          .domain(groups)
-          .range([0, width])
-          .padding([0.2])
-      svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x).tickSizeOuter(0));
-
-      // X Axis Label
-      svg.append("text")
-          .attr("text-anchor", "middle")
+        svg.append("text")
           .attr("x", width / 2)
-          .attr("y", height + margin.bottom - 15)  
-          .style("font-size", "14px")
-          .text("Age Groups");
+          .attr("y", -20)
+          .attr("text-anchor", "middle")
+          .style("font-size", "16px")
+          .style("font-weight", "bold")
+          .text("Heart Disease Distribution across Age Groups");
 
-      // Add Y axis
-      var y = d3.scaleLinear()
-        .domain([0, 3000])
-        .range([ height, 0 ]);
-      svg.append("g")
-        .call(d3.axisLeft(y));
+        // Parse the Data
+        d3.csv("heart_disease_by_age_group.csv", function(data) {
+
+        // List of subgroups = header of the csv files = soil condition here
+        var subgroups = data.columns.slice(1)
+        console.log(subgroups)
+
+        // List of groups = species here = value of the first column called group -> I show them on the X axis
+        var groups = d3.map(data, function(d){return(d.Age)}).keys()
+        console.log(groups)
+
+        // Add X axis
+        var x = d3.scaleBand()
+            .domain(groups)
+            .range([0, width])
+            .padding([0.2])
+        svg.append("g")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x).tickSizeOuter(0));
+
+        // X Axis Label
+        svg.append("text")
+            .attr("text-anchor", "middle")
+            .attr("x", width / 2)
+            .attr("y", height + margin.bottom - 15)  
+            .style("font-size", "14px")
+            .text("Age Groups");
+
+        // Add Y axis
+        var y = d3.scaleLinear()
+          .domain([0, 3000])
+          .range([ height, 0 ]);
+        svg.append("g")
+          .call(d3.axisLeft(y));
 
         svg.append("text")
           .attr("text-anchor", "middle")
@@ -94,18 +94,18 @@
           .style("font-size", "14px")
           .text("Patient Count");
 
-      // color palette = one color per subgroup
-      var color = d3.scaleOrdinal()
-        .domain(subgroups)
-        .range(['orange','#377eb8'])
+        // color palette = one color per subgroup
+        var color = d3.scaleOrdinal()
+          .domain(subgroups)
+          .range(['orange','#377eb8'])
 
-      //stack the data? --> stack per subgroup
-      var stackedData = d3.stack()
-        .keys(subgroups)
-        (data)
+        //stack the data? --> stack per subgroup
+        var stackedData = d3.stack()
+          .keys(subgroups)
+          (data)
 
-      // Show the bars
-      svg.append("g")
+        // Show the bars
+        svg.append("g")
         .selectAll("g")
         // Enter in the stack data = loop key per key = group per group
         .data(stackedData)
@@ -119,8 +119,7 @@
         .attr("y", function(d) { return y(d[1]); })
         .attr("height", function(d) { return y(d[0]) - y(d[1]); })
         .attr("width",x.bandwidth())
-                    // Get the value for that subgroup
-      .on('mouseover', function(d) {
+        .on('mouseover', function(d) {
         var key = this.parentNode.__data__.key;
         var value = d.data[key];
 
@@ -138,8 +137,8 @@
                   <strong>Value:</strong> ${value}`)
           .style("left", (d3.event.pageX + 10) + "px")
           .style("top", (d3.event.pageY - 15) + "px");
-    })
-    .on('mouseout', function(d) {
+        })
+        .on('mouseout', function(d) {
         d3.select(this)
           .transition()
           .duration(50)
@@ -148,8 +147,7 @@
         div.transition()
           .duration(50)
           .style("opacity", 0);
-    });
-
+        });
     })
     </script>
     </div>
