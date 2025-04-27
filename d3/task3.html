@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script src="https://d3js.org/d3.v4.js"></script>
+<style>
+  .tooltip-donut {
+    position: absolute;
+    background-color: white;
+    padding: 8px;
+    font-size: 12px;
+    pointer-events: none;
+    border: 1px black solid;
+  }
+
+  .dataitem{
+    justify-content: center;
+    align-items: center;
+  }
+
+  #legend {
+    margin-top: 50px;
+
+  }
+</style>
+<div id="dataviz" style ="display: flex;">
+    <div class="dataitem" id="chart">
+      <script>
+        var margin = {top: 40, right: 30, bottom: 50, left: 60},
+            width = 460 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+      
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip-donut")
+            .style("opacity", 0);
+      
+        var svg = d3.select("#chart")
+          .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      
+        svg.append("text")
+          .attr("x", width / 2)
+          .attr("y", -20)
+          .attr("text-anchor", "middle")
+          .style("font-size", "16px")
+          .style("font-weight", "bold")
+          .text("Heart Disease Rate by Smoking");
+      
+        d3.csv("heart_disease_rate_by_smoking.csv", function(data) {
+          var x = d3.scaleBand()
+            .domain(data.map(d => d.Smoking))
+            .range([0, width])
+            .padding(0.3);
+      
+          svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+      
+          svg.append("text")
+            .attr("text-anchor", "middle")
+            .attr("x", width / 2)
+            .attr("y", height + margin.bottom - 15)
+            .style("font-size", "14px")
+            .text("Smoking Status");
+      
+          var y = d3.scaleLinear()
+            .domain([0, 100])
+            .range([height, 0]);
+      
+          svg.append("g")
+            .call(d3.axisLeft(y));
+      
+          svg.append("text")
+            .attr("text-anchor", "middle")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -height / 2)
+            .attr("y", 15 - margin.left)
+            .style("font-size", "14px")
+            .text("Heart Disease Rate (%)");
+      
+          svg.selectAll("rect")
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr("x", d => x(d.Smoking))
+            .attr("y", d => y(+d["Heart Disease Rate (%)"]))
+            .attr("width", x.bandwidth())
+            .attr("height", d => height - y(+d["Heart Disease Rate (%)"]))
+            .attr("fill", "#377eb8")
+            .on("mouseover", function(d) {
+              d3.select(this).transition().duration(50).attr("opacity", 0.7);
+              div.transition().duration(50).style("opacity", 1);
+              div.html(`<strong>Smoking:</strong> ${d.Smoking}<br>
+                        <strong>Rate:</strong> ${(+d["Heart Disease Rate (%)"]).toFixed(1)}%`)
+                  .style("left", (d3.event.pageX + 10) + "px")
+                  .style("top", (d3.event.pageY - 15) + "px");
+            })
+            .on("mouseout", function() {
+              d3.select(this).transition().duration(50).attr("opacity", 1);
+              div.transition().duration(50).style("opacity", 0);
+            });
+      
+          // Value labels on top
+          svg.selectAll("text.label")
+            .data(data)
+            .enter()
+            .append("text")
+            .attr("class", "label")
+            .attr("x", d => x(d.Smoking) + x.bandwidth() / 2)
+            .attr("y", d => y(+d["Heart Disease Rate (%)"]) - 5)
+            .attr("text-anchor", "middle")
+            .style("font-size", "12px")
+            .text(d => `${(+d["Heart Disease Rate (%)"]).toFixed(1)}%`);
+        });
+      </script>
+      
+    </div>
+</div>
